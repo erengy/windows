@@ -25,6 +25,10 @@ SOFTWARE.
 #include "win_main.h"
 #include "win_window.h"
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4996)
+#endif
+
 namespace win {
 
 class WindowMap WindowMap;

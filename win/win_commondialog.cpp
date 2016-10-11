@@ -78,7 +78,7 @@ bool BrowseForFolderVista(HWND hwnd_owner,
       file_dialog->SetTitle(title.c_str());
 
     if (!default_folder.empty()) {
-      IShellItem* shell_item;
+      IShellItem* shell_item = nullptr;
       HRESULT hr = 0;
 
       typedef HRESULT (WINAPI* _SHCreateItemFromParsingName)(
