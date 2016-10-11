@@ -23,8 +23,7 @@ SOFTWARE.
 */
 
 #include "win_dde.h"
-
-#include "base/string.h"
+#include "win_string.h"
 
 namespace win {
 
