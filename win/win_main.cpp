@@ -31,7 +31,7 @@ SOFTWARE.
 
 namespace win {
 
-class WindowMap WindowMap;
+WindowMap window_map;
 
 void WindowMap::Add(HWND hwnd, Window* window) {
   if (hwnd != nullptr) {
@@ -96,7 +96,7 @@ App::App() {
 }
 
 App::~App() {
-  WindowMap.Clear();
+  window_map.Clear();
 }
 
 BOOL App::InitCommonControls(DWORD flags) const {
@@ -119,7 +119,7 @@ int App::MessageLoop() {
     if ((msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) ||
         (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)) {
       for (HWND hwnd = msg.hwnd; hwnd != nullptr; hwnd = ::GetParent(hwnd)) {
-        auto window = WindowMap.GetWindow(hwnd);
+        auto window = window_map.GetWindow(hwnd);
         if (window) {
           processed = window->PreTranslateMessage(&msg);
           if (processed)

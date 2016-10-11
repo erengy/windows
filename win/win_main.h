@@ -55,7 +55,7 @@ private:
   std::map<HWND, Window*> window_map_;
 };
 
-extern class WindowMap WindowMap;
+extern WindowMap window_map;
 
 ////////////////////////////////////////////////////////////////////////////////
 

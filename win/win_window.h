@@ -28,8 +28,6 @@ SOFTWARE.
 
 namespace win {
 
-extern const int kControlMargin;
-
 enum WindowBorderStyle {
   kWindowBorderNone,
   kWindowBorderClient,

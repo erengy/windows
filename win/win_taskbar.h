@@ -26,6 +26,10 @@ SOFTWARE.
 
 #include <shobjidl.h>
 
+extern const DWORD WM_TASKBARCALLBACK;
+extern const DWORD WM_TASKBARCREATED;
+extern const DWORD WM_TASKBARBUTTONCREATED;
+
 namespace win {
 
 class Taskbar {
@@ -61,12 +65,3 @@ private:
 };
 
 }  // namespace win
-
-////////////////////////////////////////////////////////////////////////////////
-
-extern class win::Taskbar Taskbar;
-extern class win::TaskbarList TaskbarList;
-
-extern const DWORD WM_TASKBARCALLBACK;
-extern const DWORD WM_TASKBARCREATED;
-extern const DWORD WM_TASKBARBUTTONCREATED;

@@ -28,7 +28,6 @@ SOFTWARE.
 
 namespace win {
 
-const int kControlMargin = 6;
 const std::wstring kDefaultClassName = L"DefaultW";
 
 Window* Window::current_window_ = nullptr;
@@ -155,7 +154,7 @@ void Window::Destroy() {
     prev_window_proc_ = nullptr;
   }
 
-  WindowMap.Remove(this);
+  window_map.Remove(this);
   window_ = nullptr;
 }
 
@@ -211,8 +210,8 @@ void Window::Attach(HWND hwnd) {
   Detach();
 
   if (::IsWindow(hwnd)) {
-    if (!WindowMap.GetWindow(hwnd)) {
-      WindowMap.Add(hwnd, this);
+    if (!window_map.GetWindow(hwnd)) {
+      window_map.Add(hwnd, this);
       Subclass(hwnd);
     }
   }
@@ -257,7 +256,7 @@ HWND Window::Detach() {
   if (prev_window_proc_)
     UnSubclass();
 
-  WindowMap.Remove(this);
+  window_map.Remove(this);
 
   window_ = nullptr;
 
@@ -630,13 +629,13 @@ void Window::UnSubclass() {
 
 LRESULT CALLBACK Window::WindowProcStatic(HWND hwnd, UINT uMsg,
                                           WPARAM wParam, LPARAM lParam) {
-  Window* window = WindowMap.GetWindow(hwnd);
+  Window* window = window_map.GetWindow(hwnd);
 
   if (!window) {
     window = current_window_;
     if (window) {
       window->SetWindowHandle(hwnd);
-      WindowMap.Add(hwnd, window);
+      window_map.Add(hwnd, window);
     }
   }
 
