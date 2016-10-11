@@ -29,7 +29,7 @@ SOFTWARE.
 namespace win {
 
 const int kControlMargin = 6;
-const std::wstring kDefaultClassName = L"TaigaDefaultW";
+const std::wstring kDefaultClassName = L"DefaultW";
 
 Window* Window::current_window_ = nullptr;
 

@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef TAIGA_WIN_CTRL_H
-#define TAIGA_WIN_CTRL_H
+#pragma once
 
 #include <windows.h>
 #include <commctrl.h>
@@ -431,5 +430,3 @@ protected:
 };
 
 }  // namespace win
-
-#endif  // TAIGA_WIN_CTRL_H

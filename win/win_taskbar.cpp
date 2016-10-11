@@ -34,8 +34,6 @@ const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCre
 
 namespace win {
 
-const UINT kAppSysTrayId = 74164;  // TAIGA ^_^
-
 Taskbar::Taskbar()
     : hwnd_(nullptr) {
   Version version = GetVersion();
@@ -52,7 +50,7 @@ Taskbar::~Taskbar() {
   Destroy();
 }
 
-BOOL Taskbar::Create(HWND hwnd, HICON icon, LPCWSTR tip) {
+BOOL Taskbar::Create(HWND hwnd, UINT uid, HICON icon, LPCWSTR tip) {
   Destroy();
 
   hwnd_ = hwnd;
@@ -61,7 +59,7 @@ BOOL Taskbar::Create(HWND hwnd, HICON icon, LPCWSTR tip) {
   data_.hWnd = hwnd;
   data_.szTip[0] = (WCHAR)'\0';
   data_.uCallbackMessage = WM_TASKBARCALLBACK;
-  data_.uID = kAppSysTrayId;
+  data_.uID = uid;
   data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 
   if (!icon)

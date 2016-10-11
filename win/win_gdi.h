@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef TAIGA_WIN_GDI_H
-#define TAIGA_WIN_GDI_H
+#pragma once
 
 #include "win_main.h"
 
@@ -140,5 +139,3 @@ public:
 };
 
 }  // namespace win
-
-#endif  // TAIGA_WIN_GDI_H

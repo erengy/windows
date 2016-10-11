@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef TAIGA_WIN_TASKBAR_H
-#define TAIGA_WIN_TASKBAR_H
+#pragma once
 
 #include <shobjidl.h>
 
@@ -34,7 +33,7 @@ public:
   Taskbar();
   ~Taskbar();
 
-  BOOL Create(HWND hwnd, HICON icon, LPCWSTR tooltip);
+  BOOL Create(HWND hwnd, UINT uid, HICON icon, LPCWSTR tooltip);
   BOOL Destroy();
   BOOL Modify(LPCWSTR tip);
   BOOL Tip(LPCWSTR text, LPCWSTR title, int icon_index);
@@ -71,5 +70,3 @@ extern class win::TaskbarList TaskbarList;
 extern const DWORD WM_TASKBARCALLBACK;
 extern const DWORD WM_TASKBARCREATED;
 extern const DWORD WM_TASKBARBUTTONCREATED;
-
-#endif  // TAIGA_WIN_TASKBAR_H

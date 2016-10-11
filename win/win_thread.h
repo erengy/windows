@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef TAIGA_WIN_THREAD_H
-#define TAIGA_WIN_THREAD_H
+#pragma once
 
 #include "win_main.h"
 
@@ -112,5 +111,3 @@ private:
 };
 
 }  // namespace win
-
-#endif  // TAIGA_WIN_THREAD_H

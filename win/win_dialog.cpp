@@ -25,8 +25,6 @@ SOFTWARE.
 #include "win_dialog.h"
 #include "win_taskbar.h"
 
-//#define TAIGA_WIN_DIALOG_REMEMBER_LAST_POSITION_AND_SIZE
-
 namespace win {
 
 Dialog::Dialog()
@@ -67,7 +65,7 @@ INT_PTR Dialog::Create(UINT resource_id, HWND parent, bool modal) {
 }
 
 void Dialog::EndDialog(INT_PTR result) {
-#ifdef TAIGA_WIN_DIALOG_REMEMBER_LAST_POSITION_AND_SIZE
+#ifdef WIN_DIALOG_REMEMBER_LAST_POSITION_AND_SIZE
   RECT rect;
   GetWindowRect(&rect);
   pos_last_.x = rect.left;
@@ -312,7 +310,7 @@ INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg,
       break;
     }
     case WM_INITDIALOG: {
-#ifdef TAIGA_WIN_DIALOG_REMEMBER_LAST_POSITION_AND_SIZE
+#ifdef WIN_DIALOG_REMEMBER_LAST_POSITION_AND_SIZE
       if (pos_last_.x && pos_last_.y)
         SetPosition(nullptr, pos_last_.x, pos_last_.y, 0, 0, SWP_NOSIZE);
       if (size_last_.cx && size_last_.cy)
