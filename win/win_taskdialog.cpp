@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "win_taskdialog.h"
+#include "win_version.h"
 
 namespace win {
 

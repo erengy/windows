@@ -24,41 +24,21 @@ SOFTWARE.
 
 #pragma once
 
-#include <windows.h>
-#include <commctrl.h>
-#include <uxtheme.h>
-
-#include <map>
-#include <string>
-#include <vector>
-
-#ifndef GET_X_LPARAM
-#define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
-#endif
-#ifndef GET_Y_LPARAM
-#define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
-#endif
-
 namespace win {
 
-class App {
-public:
-  App();
-  virtual ~App();
-
-  BOOL InitCommonControls(DWORD flags) const;
-  virtual BOOL InitInstance();
-  virtual int MessageLoop();
-  virtual void PostQuitMessage(int exit_code = 0);
-  virtual int Run();
-
-  std::wstring GetCurrentDirectory() const;
-  HINSTANCE GetInstanceHandle() const;
-  std::wstring GetModulePath() const;
-  BOOL SetCurrentDirectory(const std::wstring& directory);
-
-private:
-  HINSTANCE instance_;
+enum Version {
+  kVersionPreXp = 0,
+  kVersionXp,
+  kVersionServer2003,
+  kVersionVista,
+  kVersionServer2008,
+  kVersion7,
+  kVersion8,
+  kVersion8_1,
+  kVersion10,
+  kVersionUnknown
 };
+
+Version GetVersion();
 
 }  // namespace win

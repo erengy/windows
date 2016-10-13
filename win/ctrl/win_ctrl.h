@@ -28,8 +28,8 @@ SOFTWARE.
 #include <commctrl.h>
 #include <richedit.h>
 
-#include "win/win_main.h"
-#include "win/win_window.h"
+#include "../win_main.h"
+#include "../win_window.h"
 
 namespace win {
 

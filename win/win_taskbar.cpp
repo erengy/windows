@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "win_main.h"
 #include "win_taskbar.h"
+#include "win_version.h"
 
 class win::Taskbar Taskbar;
 class win::TaskbarList TaskbarList;

@@ -24,7 +24,8 @@ SOFTWARE.
 
 #include <shlobj.h>
 
-#include "win/win_commondialog.h"
+#include "win_commondialog.h"
+#include "win_version.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable: 4996)
