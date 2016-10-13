@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "win_dialog.h"
 #include "win_taskbar.h"
+#include "win_windowmap.h"
 
 namespace win {
 

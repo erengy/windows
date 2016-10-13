@@ -24,72 +24,9 @@ SOFTWARE.
 
 #include "win_main.h"
 #include "win_window.h"
-
-#ifdef _MSC_VER
-#pragma warning (disable: 4996)
-#endif
+#include "win_windowmap.h"
 
 namespace win {
-
-WindowMap window_map;
-
-void WindowMap::Add(HWND hwnd, Window* window) {
-  if (hwnd != nullptr) {
-    if (!GetWindow(hwnd)) {
-      window_map_.insert(std::make_pair(hwnd, window));
-    }
-  }
-}
-
-void WindowMap::Clear() {
-  if (window_map_.empty())
-    return;
-
-  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
-    HWND hwnd = it->first;
-    if (::IsWindow(hwnd))
-      ::DestroyWindow(hwnd);
-  }
-
-  window_map_.clear();
-}
-
-Window* WindowMap::GetWindow(HWND hwnd) {
-  if (window_map_.empty())
-    return nullptr;
-
-  auto it = window_map_.find(hwnd);
-  if (it != window_map_.end())
-    return it->second;
-
-  return nullptr;
-}
-
-void WindowMap::Remove(HWND hwnd) {
-  if (window_map_.empty())
-    return;
-
-  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
-    if (hwnd == it->first) {
-      window_map_.erase(it);
-      return;
-    }
-  }
-}
-
-void WindowMap::Remove(Window* window) {
-  if (window_map_.empty())
-    return;
-
-  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
-    if (window == it->second) {
-      window_map_.erase(it);
-      return;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 App::App() {
   instance_ = ::GetModuleHandle(nullptr);

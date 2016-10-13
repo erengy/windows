@@ -24,58 +24,24 @@ SOFTWARE.
 
 #pragma once
 
-#include <windows.h>
-#include <commctrl.h>
-#include <uxtheme.h>
-
-#include <map>
-#include <string>
-#include <vector>
-
-#ifndef GET_X_LPARAM
-#define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
-#endif
-#ifndef GET_Y_LPARAM
-#define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
-#endif
+#include "win_main.h"
 
 namespace win {
 
-class App {
+class Window;
+
+class WindowMap {
 public:
-  App();
-  virtual ~App();
-
-  BOOL InitCommonControls(DWORD flags) const;
-  virtual BOOL InitInstance();
-  virtual int MessageLoop();
-  virtual void PostQuitMessage(int exit_code = 0);
-  virtual int Run();
-
-  std::wstring GetCurrentDirectory() const;
-  HINSTANCE GetInstanceHandle() const;
-  std::wstring GetModulePath() const;
-  BOOL SetCurrentDirectory(const std::wstring& directory);
+  void Add(HWND hwnd, Window* window);
+  void Clear();
+  Window* GetWindow(HWND hwnd) const;
+  void Remove(HWND hwnd);
+  void Remove(Window* window);
 
 private:
-  HINSTANCE instance_;
+  std::map<HWND, Window*> window_map_;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
-enum Version {
-  kVersionPreXp = 0,
-  kVersionXp,
-  kVersionServer2003,
-  kVersionVista,
-  kVersionServer2008,
-  kVersion7,
-  kVersion8,
-  kVersion8_1,
-  kVersion10,
-  kVersionUnknown
-};
-
-Version GetVersion();
+extern WindowMap window_map;
 
 }  // namespace win
