@@ -28,20 +28,19 @@ namespace win {
 
 WindowMap window_map;
 
+Window* WindowMap::GetWindow(HWND hwnd) const {
+  auto it = window_map_.find(hwnd);
+  return it != window_map_.end() ? it->second : nullptr;
+}
+
 void WindowMap::Add(HWND hwnd, Window* window) {
-  if (hwnd != nullptr) {
-    if (!GetWindow(hwnd)) {
-      window_map_.insert(std::make_pair(hwnd, window));
-    }
-  }
+  if (hwnd && !GetWindow(hwnd))
+    window_map_.insert(std::make_pair(hwnd, window));
 }
 
 void WindowMap::Clear() {
-  if (window_map_.empty())
-    return;
-
-  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
-    HWND hwnd = it->first;
+  for (const auto& pair : window_map_) {
+    const HWND hwnd = pair.first;
     if (::IsWindow(hwnd))
       ::DestroyWindow(hwnd);
   }
@@ -49,33 +48,11 @@ void WindowMap::Clear() {
   window_map_.clear();
 }
 
-Window* WindowMap::GetWindow(HWND hwnd) const {
-  if (window_map_.empty())
-    return nullptr;
-
-  auto it = window_map_.find(hwnd);
-  if (it != window_map_.end())
-    return it->second;
-
-  return nullptr;
-}
-
 void WindowMap::Remove(HWND hwnd) {
-  if (window_map_.empty())
-    return;
-
-  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
-    if (hwnd == it->first) {
-      window_map_.erase(it);
-      return;
-    }
-  }
+  window_map_.erase(hwnd);
 }
 
 void WindowMap::Remove(Window* window) {
-  if (window_map_.empty())
-    return;
-
   for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
     if (window == it->second) {
       window_map_.erase(it);

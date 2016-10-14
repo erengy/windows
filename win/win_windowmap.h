@@ -32,9 +32,10 @@ class Window;
 
 class WindowMap {
 public:
+  Window* GetWindow(HWND hwnd) const;
+
   void Add(HWND hwnd, Window* window);
   void Clear();
-  Window* GetWindow(HWND hwnd) const;
   void Remove(HWND hwnd);
   void Remove(Window* window);
 
