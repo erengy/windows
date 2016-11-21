@@ -47,6 +47,7 @@ public:
   virtual ~App();
 
   BOOL InitCommonControls(DWORD flags) const;
+
   virtual BOOL InitInstance();
   virtual int MessageLoop();
   virtual void PostQuitMessage(int exit_code = 0);

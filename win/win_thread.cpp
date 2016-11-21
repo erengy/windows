@@ -39,14 +39,14 @@ Thread::~Thread() {
 }
 
 bool Thread::CloseThreadHandle() {
-  BOOL value = TRUE;
+  BOOL result = TRUE;
 
   if (thread_) {
-    value = ::CloseHandle(thread_);
+    result = ::CloseHandle(thread_);
     thread_ = nullptr;
   }
 
-  return value != FALSE;
+  return result != FALSE;
 }
 
 bool Thread::CreateThread(LPSECURITY_ATTRIBUTES thread_attributes,
