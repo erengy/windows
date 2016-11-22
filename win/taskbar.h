@@ -24,6 +24,7 @@ SOFTWARE.
 
 #pragma once
 
+#include <windows.h>
 #include <shobjidl.h>
 
 extern const DWORD WM_TASKBARCALLBACK;

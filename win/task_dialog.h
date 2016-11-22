@@ -24,7 +24,10 @@ SOFTWARE.
 
 #pragma once
 
-#include "win_main.h"
+#include <vector>
+
+#include <windows.h>
+#include <commctrl.h>
 
 #define TD_ICON_NONE         static_cast<PCWSTR>(0)
 #define TD_ICON_INFORMATION  TD_INFORMATION_ICON

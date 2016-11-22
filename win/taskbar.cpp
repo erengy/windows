@@ -22,9 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_main.h"
-#include "win_taskbar.h"
-#include "win_version.h"
+#include "taskbar.h"
+#include "version.h"
 
 class win::Taskbar Taskbar;
 class win::TaskbarList TaskbarList;

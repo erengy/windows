@@ -22,12 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_main.h"
-#include "win_version.h"
-
 #ifdef _MSC_VER
 #pragma warning (disable: 4996)
 #endif
+
+#include <windows.h>
+
+#include "version.h"
 
 namespace win {
 

@@ -22,9 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_dialog.h"
-#include "win_taskbar.h"
-#include "win_windowmap.h"
+#include <vector>
+
+#include <windowsx.h>
+
+#include "dialog.h"
+#include "taskbar.h"
+#include "window_map.h"
 
 namespace win {
 

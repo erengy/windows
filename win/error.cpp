@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <windows.h>
 
-#include "win_error.h"
+#include "error.h"
 
 namespace win {
 
@@ -39,7 +39,7 @@ ErrorMode::~ErrorMode() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::wstring FormatError(DWORD error, const std::wstring* source) {
+std::wstring FormatError(unsigned long error, const std::wstring* source) {
   DWORD flags = FORMAT_MESSAGE_IGNORE_INSERTS;
   HMODULE module_handle = nullptr;
 

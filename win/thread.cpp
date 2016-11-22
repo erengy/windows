@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_main.h"
-#include "win_thread.h"
+#include "thread.h"
 
 namespace win {
 

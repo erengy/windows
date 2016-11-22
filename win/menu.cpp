@@ -22,7 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_menu.h"
+#include <string>
+#include <vector>
+
+#include "menu.h"
 
 namespace win {
 

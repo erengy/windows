@@ -22,9 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_main.h"
-#include "win_resizable.h"
-#include "win_gdi.h"
+#define NOMINMAX
+
+#include <algorithm>
+
+#include "gdi.h"
+#include "resizable.h"
 
 // see: http://support.microsoft.com/kb/262954
 
@@ -93,16 +96,16 @@ void Resizable::OnScroll(HWND hwnd, int bar, UINT code) {
 
   switch (code) {
     case SB_LINEUP:
-      pos = max(si.nPos - 1, min_pos);
+      pos = std::max(si.nPos - 1, min_pos);
       break;
     case SB_LINEDOWN:
-      pos = min(si.nPos + 1, max_pos);
+      pos = std::min(si.nPos + 1, max_pos);
       break;
     case SB_PAGEUP:
-      pos = max(si.nPos - (int)si.nPage, min_pos);
+      pos = std::max(si.nPos - (int)si.nPage, min_pos);
       break;
     case SB_PAGEDOWN:
-      pos = min(si.nPos + (int)si.nPage, max_pos);
+      pos = std::min(si.nPos + (int)si.nPage, max_pos);
       break;
     case SB_THUMBPOSITION:
       break;

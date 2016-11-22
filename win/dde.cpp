@@ -22,8 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_dde.h"
-#include "win_string.h"
+#include <string>
+
+#include "dde.h"
+#include "string.h"
 
 namespace win {
 

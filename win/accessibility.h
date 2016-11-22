@@ -25,8 +25,10 @@ SOFTWARE.
 #pragma once
 
 #include <string>
-#include <OleAcc.h>
 #include <vector>
+
+#include <windows.h>
+#include <OleAcc.h>
 
 namespace win {
 

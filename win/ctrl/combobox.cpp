@@ -22,8 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_ctrl.h"
 #include <windowsx.h>
+
+#include "../common_controls.h"
 
 namespace win {
 

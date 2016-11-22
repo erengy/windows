@@ -22,11 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_gdiplus.h"
-#include <gdiplus.h>
+#pragma comment(lib, "gdiplus.lib")
+
 #include <memory>
 
-#pragma comment(lib, "gdiplus.lib")
+#include <windows.h>
+#include <gdiplus.h>
+
+#include "gdi_plus.h"
 
 namespace win {
 

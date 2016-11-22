@@ -22,8 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "win_taskdialog.h"
-#include "win_version.h"
+#include <vector>
+
+#include "task_dialog.h"
+#include "version.h"
 
 namespace win {
 

@@ -24,7 +24,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "win_main.h"
+#include <windows.h>
 
 namespace win {
 

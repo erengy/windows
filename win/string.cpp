@@ -25,8 +25,7 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
-#include "win_main.h"
-#include "win_string.h"
+#include "string.h"
 
 namespace win {
 

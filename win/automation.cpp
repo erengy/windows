@@ -25,7 +25,7 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
-#include "win_automation.h"
+#include "automation.h"
 
 namespace win {
 

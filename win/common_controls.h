@@ -24,12 +24,14 @@ SOFTWARE.
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
 
-#include "../win_main.h"
-#include "../win_window.h"
+#include "window.h"
 
 namespace win {
 
