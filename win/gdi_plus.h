@@ -26,7 +26,16 @@ SOFTWARE.
 
 #include <string>
 
+#ifdef NOMINMAX
+#include <algorithm>
+namespace Gdiplus {
+using std::min;
+using std::max;
+}
+#endif
+
 #include <windows.h>
+#include <gdiplus.h>
 
 namespace win {
 

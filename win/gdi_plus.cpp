@@ -26,9 +26,6 @@ SOFTWARE.
 
 #include <memory>
 
-#include <windows.h>
-#include <gdiplus.h>
-
 #include "gdi_plus.h"
 
 namespace win {
