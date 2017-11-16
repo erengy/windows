@@ -25,9 +25,6 @@ SOFTWARE.
 #include "taskbar.h"
 #include "version.h"
 
-class win::Taskbar Taskbar;
-class win::TaskbarList TaskbarList;
-
 const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
 const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
 const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCreated");

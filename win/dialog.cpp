@@ -353,7 +353,7 @@ INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg,
     case WM_MOUSEWHEEL: {
       LRESULT result = OnMouseEvent(uMsg, wParam, lParam);
       if (result != -1) {
-        ::SetWindowLongPtrW(hwnd, DWL_MSGRESULT, result);
+        ::SetWindowLongPtrW(hwnd, DWLP_MSGRESULT, result);
         return TRUE;
       }
       break;
@@ -366,7 +366,7 @@ INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg,
     case WM_NOTIFY: {
       LRESULT result = OnNotify(wParam, reinterpret_cast<LPNMHDR>(lParam));
       if (result) {
-        ::SetWindowLongPtr(hwnd, DWL_MSGRESULT, result);
+        ::SetWindowLongPtr(hwnd, DWLP_MSGRESULT, result);
         return TRUE;
       }
       break;
