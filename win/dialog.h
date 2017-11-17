@@ -71,6 +71,8 @@ protected:
   virtual INT_PTR DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+  using Window::Create; // Hide Create method from the base class
+
   static INT_PTR CALLBACK DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   void SetMinMaxInfo(LPMINMAXINFO mmi);

@@ -236,7 +236,8 @@ void Window::CenterOwner() {
   }
 
   HMONITOR monitor = ::MonitorFromWindow(window_, MONITOR_DEFAULTTONEAREST);
-  MONITORINFO mi = { sizeof(mi), 0 };
+  MONITORINFO mi = {0};
+  mi.cbSize = sizeof(mi);
   if (::GetMonitorInfo(monitor, &mi)) {
     rc_desktop = mi.rcWork;
     if (!parent_)
