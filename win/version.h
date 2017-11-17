@@ -27,7 +27,8 @@ SOFTWARE.
 namespace win {
 
 enum Version {
-  kVersionPreXp = 0,
+  kVersionUnknown = 0,
+  kVersion2000,
   kVersionXp,
   kVersionServer2003,
   kVersionVista,
@@ -36,7 +37,6 @@ enum Version {
   kVersion8,
   kVersion8_1,
   kVersion10,
-  kVersionUnknown
 };
 
 Version GetVersion();
