@@ -25,7 +25,6 @@ SOFTWARE.
 #include <shlobj.h>
 
 #include "common_dialogs.h"
-#include "version.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable: 4996)
@@ -57,10 +56,10 @@ std::wstring BrowseForFile(HWND hwnd_owner,
   }
 }
 
-bool BrowseForFolderVista(HWND hwnd_owner,
-                          const std::wstring& title,
-                          const std::wstring& default_folder,
-                          std::wstring& output) {
+bool BrowseForFolder(HWND hwnd_owner,
+                     const std::wstring& title,
+                     const std::wstring& default_path,
+                     std::wstring& output) {
   IFileDialog* file_dialog;
   bool result = false;
 
@@ -78,7 +77,7 @@ bool BrowseForFolderVista(HWND hwnd_owner,
     if (!title.empty())
       file_dialog->SetTitle(title.c_str());
 
-    if (!default_folder.empty()) {
+    if (!default_path.empty()) {
       IShellItem* shell_item = nullptr;
       HRESULT hr = 0;
 
@@ -89,7 +88,7 @@ bool BrowseForFolderVista(HWND hwnd_owner,
         auto proc = reinterpret_cast<_SHCreateItemFromParsingName>(
             GetProcAddress(module, "SHCreateItemFromParsingName"));
         if (proc != nullptr) {
-          hr = (proc)(default_folder.c_str(), nullptr, IID_IShellItem,
+          hr = (proc)(default_path.c_str(), nullptr, IID_IShellItem,
                       reinterpret_cast<void**>(&shell_item));
         }
         FreeLibrary(module);
@@ -121,58 +120,6 @@ bool BrowseForFolderVista(HWND hwnd_owner,
   }
 
   return result;
-}
-
-static int CALLBACK BrowseForFolderXpProc(
-    HWND hwnd_owner, UINT uMsg, LPARAM lParam, LPARAM lpData) {
-  switch (uMsg) {
-    case BFFM_INITIALIZED:
-      if (lpData != 0)
-        SendMessage(hwnd_owner, BFFM_SETSELECTION, TRUE, lpData);
-      break;
-  }
-
-  return 0;
-}
-
-bool BrowseForFolderXp(HWND hwnd_owner,
-                       const std::wstring& title,
-                       const std::wstring& default_path,
-                       std::wstring& output) {
-  BROWSEINFO bi = {0};
-  bi.hwndOwner = hwnd_owner;
-  bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON;
-
-  if (!title.empty())
-    bi.lpszTitle = title.c_str();
-
-  if (!default_path.empty()) {
-    WCHAR path[MAX_PATH] = {'\0'};
-    default_path.copy(path, MAX_PATH);
-    bi.lParam = reinterpret_cast<LPARAM>(path);
-    bi.lpfn = BrowseForFolderXpProc;
-  }
-
-  PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-  if (pidl == nullptr)
-    return false;
-
-  WCHAR path[MAX_PATH];
-  SHGetPathFromIDList(pidl, path);
-  output = path;
-
-  return !output.empty();
-}
-
-bool BrowseForFolder(HWND hwnd_owner,
-                     const std::wstring& title,
-                     const std::wstring& default_path,
-                     std::wstring& output) {
-  if (win::GetVersion() >= win::kVersionVista) {
-    return BrowseForFolderVista(hwnd_owner, title, default_path, output);
-  } else {
-    return BrowseForFolderXp(hwnd_owner, title, default_path, output);
-  }
 }
 
 }  // namespace win

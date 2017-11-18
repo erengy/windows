@@ -25,7 +25,6 @@ SOFTWARE.
 #include <vector>
 
 #include "task_dialog.h"
-#include "version.h"
 
 namespace win {
 
@@ -158,79 +157,10 @@ HRESULT TaskDialog::Show(HWND parent) {
       config_.dwFlags &= ~TDF_ALLOW_DIALOG_CANCELLATION;
   }
 
-  // Show task dialog, if available
-  if (GetVersion() >= kVersionVista) {
-    BOOL verification_flag_checked = TRUE;
-    return ::TaskDialogIndirect(&config_, &selected_button_id_, nullptr,
-                                &verification_flag_checked);
-
-  // Fall back to normal message box
-  } else {
-    MSGBOXPARAMS msgbox;
-    msgbox.cbSize = sizeof(MSGBOXPARAMS);
-    msgbox.hwndOwner = parent;
-    msgbox.hInstance = config_.hInstance;
-    msgbox.lpszCaption = config_.pszWindowTitle;
-
-    // Set message
-    #define ADD_MSG(x) \
-        if (x) { msg += L"\n\n"; msg += x; }
-    std::wstring msg = config_.pszMainInstruction;
-    ADD_MSG(config_.pszContent);
-    ADD_MSG(config_.pszExpandedInformation);
-    ADD_MSG(config_.pszFooter);
-    #undef ADD_MSG
-    msgbox.lpszText = msg.c_str();
-
-    // Set buttons
-    button_text.resize(config_.cButtons);
-    for (unsigned int i = 0; i < button_text.size(); i++) {
-      button_text[i] = buttons_[i].pszButtonText;
-      unsigned int pos = button_text[i].find(L"\n");
-      if (pos != std::wstring::npos)
-        button_text[i].resize(pos);
-    }
-    switch (config_.cButtons) {
-      case 2:
-        msgbox.dwStyle = MB_YESNO;
-        break;
-      case 3:
-        msgbox.dwStyle = MB_YESNOCANCEL;
-        break;
-      default:
-        msgbox.dwStyle = MB_OK;
-        break;
-    }
-
-    // Set icon
-    if (config_.pszMainIcon == TD_ICON_INFORMATION ||
-        config_.pszMainIcon == TD_ICON_SHIELD ||
-        config_.pszMainIcon == TD_ICON_SHIELD_GREEN) {
-      msgbox.dwStyle |=
-          (config_.cButtons > 1 ? MB_ICONQUESTION : MB_ICONINFORMATION);
-    } else if (config_.pszMainIcon == TD_ICON_WARNING) {
-      msgbox.dwStyle |= MB_ICONWARNING;
-    } else if (config_.pszMainIcon == TD_ICON_ERROR ||
-               config_.pszMainIcon == TD_ICON_SHIELD_RED) {
-      msgbox.dwStyle |= MB_ICONERROR;
-    }
-
-    // Hook
-    if (!parent)
-      parent = ::GetDesktopWindow();
-    ::SetProp(parent, L"MsgBoxHook", ::SetWindowsHookEx(WH_CALLWNDPROCRET,
-              MsgBoxHookProc, nullptr, ::GetCurrentThreadId()));
-
-    // Show message box
-    selected_button_id_ = ::MessageBoxIndirect(&msgbox);
-
-    // Unhook
-    if (::GetProp(parent, L"MsgBoxHook"))
-      ::UnhookWindowsHookEx(reinterpret_cast<HHOOK>(::RemoveProp(
-          parent, L"MsgBoxHook")));
-
-    return S_OK;
-  }
+  // Show task dialog
+  BOOL verification_flag_checked = TRUE;
+  return ::TaskDialogIndirect(&config_, &selected_button_id_, nullptr,
+                              &verification_flag_checked);
 }
 
 // MessageBox hook - used to change button text.

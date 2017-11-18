@@ -22,72 +22,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4996)
-#endif
-
-#include <windows.h>
-
 #include "version.h"
 
 namespace win {
 
+// We can't expect that the compiler has VersionHelpers.h,
+// so use our own functions to check the Windows version.
+inline bool IsWindowsVersionOrGreater(WORD major, WORD minor, WORD build) {
+  OSVERSIONINFOEXW vi = { sizeof(vi),
+                          major, minor, build, 0, {0}, 0 };
+  return ::VerifyVersionInfoW(&vi,
+            VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
+            ::VerSetConditionMask(::VerSetConditionMask(::VerSetConditionMask(0,
+                                      VER_MAJORVERSION, VER_GREATER_EQUAL),
+                                      VER_MINORVERSION, VER_GREATER_EQUAL),
+                                      VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL));
+}
+
+inline bool IsWindowsServer() {
+  OSVERSIONINFOEXW vi = { sizeof(vi),
+                          0, 0, 0, 0, {0}, 0, 0, 0, VER_NT_WORKSTATION };
+  return !::VerifyVersionInfoW(&vi, VER_PRODUCT_TYPE,
+                        ::VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL));
+}
+
 Version GetVersion() {
   static bool checked = false;
-  static Version version = kVersionPreXp;
+  static Version version = kVersionUnknown;
 
-  if (!checked) {
-    OSVERSIONINFOEX version_info;
-    version_info.dwOSVersionInfoSize = sizeof(version_info);
-    GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&version_info));
+  if (checked)
+    return version;
 
-    if (version_info.dwMajorVersion == 5) {
-      switch (version_info.dwMinorVersion) {
-        case 0:
-          version = kVersionPreXp;
-          break;
-        case 1:
-          version = kVersionXp;
-          break;
-        case 2:
-        default:
-          version = kVersionServer2003;
-          break;
-      }
-    } else if (version_info.dwMajorVersion == 6) {
-      if (version_info.wProductType != VER_NT_WORKSTATION) {
-        version = kVersionServer2008;
-      } else {
-        switch (version_info.dwMinorVersion) {
-          case 0:
-            version = kVersionVista;
-            break;
-          case 1:
-            version = kVersion7;
-            break;
-          case 2:
-            version = kVersion8;
-            break;
-          case 3:
-          default:
-            version = kVersion8_1;
-            break;
-        }
-      }
-    } else if (version_info.dwMajorVersion == 10) {
-      switch (version_info.dwMinorVersion) {
-        case 0:
-        default:
-          version = kVersion10;
-          break;
-      }
-    } else if (version_info.dwMajorVersion > 10) {
-      version = kVersionUnknown;
-    }
+  if (IsWindowsVersionOrGreater(10, 0))
+    version = kVersion10;
+  else if (IsWindowsVersionOrGreater(6, 3))
+    version = kVersion8_1;
+  else if (IsWindowsVersionOrGreater(6, 2))
+    version = kVersion8;
+  else if (IsWindowsVersionOrGreater(6, 1))
+    version = kVersion7;
+  else if (IsWindowsVersionOrGreater(6, 0))
+    version = kVersionVista;
 
-    checked = true;
-  }
-
+  checked = true;
   return version;
 }
 
