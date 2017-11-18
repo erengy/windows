@@ -22,18 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <windows.h>
-
 #include "version.h"
 
 namespace win {
 
 // We can't expect that the compiler has VersionHelpers.h,
 // so use our own functions to check the Windows version.
-// An underscore added to avoid name collision.
-inline bool _IsWindowsVersionOrGreater(WORD major, WORD minor) {
+inline bool IsWindowsVersionOrGreater(WORD major, WORD minor, WORD build) {
   OSVERSIONINFOEXW vi = { sizeof(vi),
-                          major, minor, 0, 0, {0}, 0 };
+                          major, minor, build, 0, {0}, 0 };
   return ::VerifyVersionInfoW(&vi,
             VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
             ::VerSetConditionMask(::VerSetConditionMask(::VerSetConditionMask(0,
@@ -42,7 +39,7 @@ inline bool _IsWindowsVersionOrGreater(WORD major, WORD minor) {
                                       VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL));
 }
 
-inline bool _IsWindowsServer() {
+inline bool IsWindowsServer() {
   OSVERSIONINFOEXW vi = { sizeof(vi),
                           0, 0, 0, 0, {0}, 0, 0, 0, VER_NT_WORKSTATION };
   return !::VerifyVersionInfoW(&vi, VER_PRODUCT_TYPE,
@@ -56,20 +53,16 @@ Version GetVersion() {
   if (checked)
     return version;
 
-  if (_IsWindowsVersionOrGreater(10, 0))
+  if (IsWindowsVersionOrGreater(10, 0))
     version = kVersion10;
-  else if (_IsWindowsVersionOrGreater(6, 3))
+  else if (IsWindowsVersionOrGreater(6, 3))
     version = kVersion8_1;
-  else if (_IsWindowsVersionOrGreater(6, 2))
+  else if (IsWindowsVersionOrGreater(6, 2))
     version = kVersion8;
-  else if (_IsWindowsVersionOrGreater(6, 1))
+  else if (IsWindowsVersionOrGreater(6, 1))
     version = kVersion7;
-  else if (_IsWindowsVersionOrGreater(6, 0))
-    version = _IsWindowsServer() ? kVersionServer2008 : kVersionVista;
-  else if (_IsWindowsVersionOrGreater(5, 1))
-    version = _IsWindowsServer() ? kVersionServer2003 : kVersionXp;
-  else if (_IsWindowsVersionOrGreater(5, 0))
-    version = kVersion2000;
+  else if (IsWindowsVersionOrGreater(6, 0))
+    version = kVersionVista;
 
   checked = true;
   return version;

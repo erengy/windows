@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include "../common_controls.h"
-#include "../version.h"
 
 namespace win {
 
@@ -66,10 +65,6 @@ int ListView::InsertColumn(int index, int width, int width_min, int align,
   lvc.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH |
              (width_min ? LVCF_MINWIDTH : 0);
   lvc.pszText = const_cast<LPWSTR>(text);
-
-  if (GetVersion() < kVersionVista)
-    lvc.cx = lvc.cxMin;
-
   return ListView_InsertColumn(window_, index, &lvc);
 }
 
@@ -87,7 +82,7 @@ int ListView::InsertGroup(int index, LPCWSTR text,
   lvg.mask = LVGF_HEADER | LVGF_GROUPID;
   lvg.pszHeader = const_cast<LPWSTR>(text);
 
-  if (collapsable && GetVersion() >= kVersionVista) {
+  if (collapsable) {
     lvg.mask |= LVGF_STATE;
     lvg.state = LVGS_COLLAPSIBLE;
     if (collapsed)
@@ -419,24 +414,7 @@ void ListView::Sort(int sort_column, int sort_order, int type,
   sort_column_ = sort_column;
   sort_order_ = (sort_order == 0) ? 1 : sort_order;
   sort_type_ = type;
-
   ListView_SortItemsEx(window_, compare, this);
-
-  if (GetVersion() < kVersionVista) {
-    HDITEM hdi = {0};
-    hdi.mask = HDI_FORMAT;
-
-    HWND header = ListView_GetHeader(window_);
-    for (int i = 0; i < Header_GetItemCount(header); ++i) {
-      Header_GetItem(header, i, &hdi);
-      hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP);
-      Header_SetItem(header, i, &hdi);
-    }
-
-    Header_GetItem(header, sort_column, &hdi);
-    hdi.fmt |= (sort_order > -1 ? HDF_SORTUP : HDF_SORTDOWN);
-    Header_SetItem(header, sort_column, &hdi);
-  }
 }
 
 }  // namespace win

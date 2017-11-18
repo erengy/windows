@@ -24,21 +24,21 @@ SOFTWARE.
 
 #pragma once
 
+#include <windows.h>
+
 namespace win {
 
 enum Version {
   kVersionUnknown = 0,
-  kVersion2000,
-  kVersionXp,
-  kVersionServer2003,
   kVersionVista,
-  kVersionServer2008,
   kVersion7,
   kVersion8,
   kVersion8_1,
   kVersion10,
 };
 
+inline bool IsWindowsVersionOrGreater(WORD major, WORD minor, WORD build = 0);
+inline bool IsWindowsServer();
 Version GetVersion();
 
 }  // namespace win

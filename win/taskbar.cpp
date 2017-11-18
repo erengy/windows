@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include "taskbar.h"
-#include "version.h"
 
 const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
 const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
@@ -33,14 +32,7 @@ namespace win {
 
 Taskbar::Taskbar()
     : hwnd_(nullptr) {
-  Version version = GetVersion();
-  if (version >= kVersionVista) {
-    data_.cbSize = sizeof(NOTIFYICONDATA);
-  } else if (version >= kVersionXp) {
-    data_.cbSize = NOTIFYICONDATA_V3_SIZE;
-  } else {
-    data_.cbSize = NOTIFYICONDATA_V2_SIZE;
-  }
+  data_.cbSize = sizeof(data_);
 }
 
 Taskbar::~Taskbar() {
