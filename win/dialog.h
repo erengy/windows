@@ -74,10 +74,12 @@ private:
   static INT_PTR CALLBACK DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   void SetMinMaxInfo(LPMINMAXINFO mmi);
-  void SnapToEdges(LPWINDOWPOS window_pos);
+  bool SnapToEdges(LPRECT rc);
 
   bool  modal_;
-  int   snap_gap_;
+  bool  moving_;
+  bool  snapped_;
+  int   snap_gap_, snap_dx_, snap_dy_;
   SIZE  size_last_, size_max_, size_min_;
   POINT pos_last_;
 };
