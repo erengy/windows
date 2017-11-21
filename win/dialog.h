@@ -39,7 +39,6 @@ public:
   virtual void EndDialog(INT_PTR result);
   virtual void SetSizeMax(LONG cx, LONG cy);
   virtual void SetSizeMin(LONG cx, LONG cy);
-  virtual void SetSnapGap(int snap_gap);
 
   virtual BOOL AddComboString(int id_combo, LPCWSTR text);
   virtual BOOL CheckDlgButton(int id_button, UINT check);
@@ -71,17 +70,13 @@ protected:
   virtual INT_PTR DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-  using Window::Create; // Hide Create method from the base class
+  using Window::Create;  // hide method of the base class
 
   static INT_PTR CALLBACK DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   void SetMinMaxInfo(LPMINMAXINFO mmi);
-  bool SnapToEdges(LPRECT rc);
 
   bool  modal_;
-  bool  moving_;
-  bool  snapped_;
-  int   snap_gap_, snap_dx_, snap_dy_;
   SIZE  size_last_, size_max_, size_min_;
   POINT pos_last_;
 };
