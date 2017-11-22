@@ -35,7 +35,7 @@ public:
   BOOL SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-  bool SnapToEdges(LPRECT rc);
+  bool SnapToEdges(HWND hwnd, LPRECT rc);
 
   bool moving_ = false;
   bool snapped_ = false;

@@ -25,6 +25,7 @@ SOFTWARE.
 #include <windows.h>
 #include <dwmapi.h>
 
+#include "gdi.h"
 #include "snappable.h"
 
 namespace win {
@@ -38,11 +39,11 @@ BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     case WM_ENTERSIZEMOVE: {
       moving_ = true;
       if (snapped_) {
-        // Save the cursor offset from the window borders,
-        // so the dialog window can be unsnapped later
+        // Save the cursor offset from the window borders, so the dialog window
+        // can be unsnapped later
         RECT rc;
         POINT cursor;
-        if (GetWindowRect(&rc) && GetCursorPos(&cursor)) {
+        if (::GetWindowRect(hwnd, &rc) && ::GetCursorPos(&cursor)) {
           snap_dx_ = cursor.x - rc.left;
           snap_dy_ = cursor.y - rc.top;
         }
@@ -55,7 +56,7 @@ BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     }
     case WM_MOVING: {
       moving_ = true;
-      if (SnapToEdges(reinterpret_cast<LPRECT>(lParam)))
+      if (SnapToEdges(hwnd, reinterpret_cast<LPRECT>(lParam)))
         return TRUE;
       break;
     }
@@ -71,67 +72,68 @@ BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Snappable::SnapToEdges(LPRECT rc) {
+bool Snappable::SnapToEdges(HWND hwnd, LPRECT rc) {
   if (!snap_gap_) {
     snapped_ = false;
     return false;
   }
 
-  RECT rect;
+  Rect rect;
   POINT cursor;
-  if (!GetWindowRect(&rect) || !GetCursorPos(&cursor))
+  if (!::GetWindowRect(hwnd, &rect) || !::GetCursorPos(&cursor))
     return false;
+
   // Check for aero snapping
-  if ((rc->right - rc->left != rect.right - rect.left) ||
-      (rc->bottom - rc->top != rect.bottom - rect.top))
+  if ((rc->right - rc->left != rect.Width()) ||
+      (rc->bottom - rc->top != rect.Height()))
     return false;
 
   RECT wr = {0};
-  SystemParametersInfo(SPI_GETWORKAREA, 0, &wr, 0);
-  if (GetSystemMetrics(SM_CMONITORS) > 1) {
-    HMONITOR monitor = MonitorFromWindow(window_, MONITOR_DEFAULTTONEAREST);
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &wr, 0);
+  if (::GetSystemMetrics(SM_CMONITORS) > 1) {
+    HMONITOR monitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
     if (monitor) {
       MONITORINFO mi;
       mi.cbSize = sizeof(mi);
-      GetMonitorInfo(monitor, &mi);
+      ::GetMonitorInfo(monitor, &mi);
       wr = mi.rcWork;
     }
   }
 
   // Check for invisible borders and adjust the work area size
   RECT frame = {0};
-  if (DwmGetWindowAttribute(window_, DWMWA_EXTENDED_FRAME_BOUNDS,
-                            &frame, sizeof(RECT)) == S_OK) {
+  if (::DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS,
+                              &frame, sizeof(RECT)) == S_OK) {
     wr.left -= frame.left - rect.left;
     wr.top -= frame.top - rect.top;
     wr.right += rect.right - frame.right;
     wr.bottom += rect.bottom - frame.bottom;
   }
 
-  // Let the window to unsnap by changing its position,
-  // otherwise it will stick to the screen edges forever
-  rect = *rc;
+  // Let the window to unsnap by changing its position, otherwise it will stick
+  // to the screen edges forever
+  rect.Copy(*rc);
   if (snapped_) {
-    OffsetRect(&rect, cursor.x - rect.left - snap_dx_,
-                      cursor.y - rect.top - snap_dy_);
+    rect.Offset(cursor.x - rect.left - snap_dx_,
+                cursor.y - rect.top - snap_dy_);
   }
 
   bool snapped = false;
   // Snap X axis
   if (abs(rect.left - wr.left) < snap_gap_) {
     snapped = true;
-    OffsetRect(&rect, wr.left - rect.left, 0);
+    rect.Offset(wr.left - rect.left, 0);
   } else if (abs(rect.right - wr.right) < snap_gap_) {
     snapped = true;
-    OffsetRect(&rect, wr.right - rect.right, 0);
+    rect.Offset(wr.right - rect.right, 0);
   }
   // Snap Y axis
   if (abs(rect.top - wr.top) < snap_gap_) {
     snapped = true;
-    OffsetRect(&rect, 0, wr.top - rect.top);
+    rect.Offset(0, wr.top - rect.top);
   } else if (abs(rect.bottom - wr.bottom) < snap_gap_) {
     snapped = true;
-    OffsetRect(&rect, 0, wr.bottom - rect.bottom);
+    rect.Offset(0, wr.bottom - rect.bottom);
   }
 
   if (!snapped_ && snapped) {
@@ -140,7 +142,8 @@ bool Snappable::SnapToEdges(LPRECT rc) {
   }
 
   snapped_ = snapped;
-  *rc = rect;
+  ::CopyRect(rc, &rect);
+
   return true;
 }
 
