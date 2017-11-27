@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <cstdlib>
+
 #include <windows.h>
 #include <dwmapi.h>
 
@@ -30,23 +32,101 @@ SOFTWARE.
 
 namespace win {
 
+POINT GetCursorOffset(const RECT& rc) {
+  POINT cursor = {0};
+  if (::GetCursorPos(&cursor)) {
+    cursor.x -= rc.left;
+    cursor.y -= rc.top;
+  }
+  return cursor;
+}
+
+Rect GetWorkArea(HWND hwnd, const Rect& rc_window) {
+  RECT rc = {0};
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+
+  if (::GetSystemMetrics(SM_CMONITORS) > 1) {
+    HMONITOR monitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+    if (monitor) {
+      MONITORINFO mi = {0};
+      mi.cbSize = sizeof(mi);
+      if (::GetMonitorInfo(monitor, &mi))
+        rc = mi.rcWork;
+    }
+  }
+
+  // Check for invisible borders
+  RECT frame = {0};
+  if (::DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS,
+                              &frame, sizeof(RECT)) == S_OK) {
+    rc.left -= frame.left - rc_window.left;
+    rc.top -= frame.top - rc_window.top;
+    rc.right += rc_window.right - frame.right;
+    rc.bottom += rc_window.bottom - frame.bottom;
+  }
+
+  return rc;
+}
+
+bool IsAeroSnapped(HWND hwnd, const Rect& rc, const Rect& rc_window) {
+  const auto equal_rect_dimensions = [](const Rect& a, const Rect& b) {
+    return a.Width() == b.Width() && a.Height() == b.Height();
+  };
+
+  // Check if window is going to be aero-snapped
+  if (!equal_rect_dimensions(rc, rc_window))
+    return true;
+
+  // Check if window has already been aero-snapped
+  WINDOWPLACEMENT wp = {0};
+  wp.length = sizeof(wp);
+  if (::GetWindowPlacement(hwnd, &wp)) {
+    if (!equal_rect_dimensions(rc, wp.rcNormalPosition))
+      return true;
+  }
+
+  return false;
+}
+
+bool SnapRect(const Rect& rc_work, const int gap, Rect& rc) {
+  const RECT d{
+    rc_work.left - rc.left,
+    rc_work.top - rc.top,
+    rc_work.right - rc.right,
+    rc_work.bottom - rc.bottom
+  };
+
+  const auto dx = std::abs(d.left) < gap ? d.left :
+                  std::abs(d.right) < gap ? d.right : 0;
+  const auto dy = std::abs(d.top) < gap ? d.top :
+                  std::abs(d.bottom) < gap ? d.bottom : 0;
+
+  if (dx || dy) {
+    rc.Offset(dx, dy);
+    return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void Snappable::SetSnapGap(int snap_gap) {
   snap_gap_ = snap_gap;
 }
 
 BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  static bool moving_ = false;
+
   switch (uMsg) {
     case WM_ENTERSIZEMOVE: {
       moving_ = true;
       if (snapped_) {
-        // Save the cursor offset from the window borders, so the dialog window
-        // can be unsnapped later
+        // Save the cursor offset from the window borders, so the window can be
+        // unsnapped later
         RECT rc;
-        POINT cursor;
-        if (::GetWindowRect(hwnd, &rc) && ::GetCursorPos(&cursor)) {
-          snap_dx_ = cursor.x - rc.left;
-          snap_dy_ = cursor.y - rc.top;
-        }
+        if (::GetWindowRect(hwnd, &rc))
+          snap_offset_ = GetCursorOffset(rc);
       }
       break;
     }
@@ -78,80 +158,28 @@ bool Snappable::SnapToEdges(HWND hwnd, LPRECT rc) {
     return false;
   }
 
-  Rect rect;
-  POINT cursor;
-  if (!::GetWindowRect(hwnd, &rect) || !::GetCursorPos(&cursor))
+  Rect rc_window;
+  if (!::GetWindowRect(hwnd, &rc_window))
     return false;
 
-  // Check if window is going to be aero-snapped
-  if ((rc->right - rc->left != rect.Width()) ||
-      (rc->bottom - rc->top != rect.Height()))
+  if (IsAeroSnapped(hwnd, rc, rc_window))
     return false;
 
-  // Check if window has already been aero-snapped
-  WINDOWPLACEMENT wp = {0};
-  wp.length = sizeof(wp);
-  if (!::GetWindowPlacement(hwnd, &wp))
-    return false;
-  Rect wpRect(wp.rcNormalPosition);
-  if ((rc->right - rc->left != wpRect.Width()) ||
-      (rc->bottom - rc->top != wpRect.Height()))
-    return false;
+  const auto offset = GetCursorOffset(*rc);
+  const auto rc_work = GetWorkArea(hwnd, rc_window);
+  Rect rect = *rc;
 
-  RECT wr = {0};
-  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &wr, 0);
-  if (::GetSystemMetrics(SM_CMONITORS) > 1) {
-    HMONITOR monitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-    if (monitor) {
-      MONITORINFO mi = {0};
-      mi.cbSize = sizeof(mi);
-      ::GetMonitorInfo(monitor, &mi);
-      wr = mi.rcWork;
-    }
-  }
+  // Let the window unsnap by changing its position, otherwise it will stick to
+  // the screen edges forever
+  if (snapped_)
+    rect.Offset(offset.x - snap_offset_.x, offset.y - snap_offset_.y);
 
-  // Check for invisible borders and adjust the work area size
-  RECT frame = {0};
-  if (::DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS,
-                              &frame, sizeof(RECT)) == S_OK) {
-    wr.left -= frame.left - rect.left;
-    wr.top -= frame.top - rect.top;
-    wr.right += rect.right - frame.right;
-    wr.bottom += rect.bottom - frame.bottom;
-  }
+  const auto snapped = SnapRect(rc_work, snap_gap_, rect);
 
-  // Let the window to unsnap by changing its position, otherwise it will stick
-  // to the screen edges forever
-  rect.Copy(*rc);
-  if (snapped_) {
-    rect.Offset(cursor.x - rect.left - snap_dx_,
-                cursor.y - rect.top - snap_dy_);
-  }
-
-  bool snapped = false;
-  // Snap X axis
-  if (abs(rect.left - wr.left) < snap_gap_) {
-    snapped = true;
-    rect.Offset(wr.left - rect.left, 0);
-  } else if (abs(rect.right - wr.right) < snap_gap_) {
-    snapped = true;
-    rect.Offset(wr.right - rect.right, 0);
-  }
-  // Snap Y axis
-  if (abs(rect.top - wr.top) < snap_gap_) {
-    snapped = true;
-    rect.Offset(0, wr.top - rect.top);
-  } else if (abs(rect.bottom - wr.bottom) < snap_gap_) {
-    snapped = true;
-    rect.Offset(0, wr.bottom - rect.bottom);
-  }
-
-  if (!snapped_ && snapped) {
-    snap_dx_ = cursor.x - rc->left;
-    snap_dy_ = cursor.y - rc->top;
-  }
-
+  if (!snapped_ && snapped)
+    snap_offset_ = offset;
   snapped_ = snapped;
+
   ::CopyRect(rc, &rect);
 
   return true;

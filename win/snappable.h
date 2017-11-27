@@ -37,11 +37,9 @@ public:
 private:
   bool SnapToEdges(HWND hwnd, LPRECT rc);
 
-  bool moving_ = false;
   bool snapped_ = false;
   int snap_gap_ = 0;
-  int snap_dx_ = 0;
-  int snap_dy_ = 0;
+  POINT snap_offset_ = {0};
 };
 
 }  // namespace win
