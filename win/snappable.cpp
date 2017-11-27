@@ -116,11 +116,11 @@ void Snappable::SetSnapGap(int snap_gap) {
 }
 
 BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  static bool moving_ = false;
+  static bool moving = false;
 
   switch (uMsg) {
     case WM_ENTERSIZEMOVE: {
-      moving_ = true;
+      moving = true;
       if (snapped_) {
         // Save the cursor offset from the window borders, so the window can be
         // unsnapped later
@@ -131,17 +131,17 @@ BOOL Snappable::SnapProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
       break;
     }
     case WM_EXITSIZEMOVE: {
-      moving_ = false;
+      moving = false;
       break;
     }
     case WM_MOVING: {
-      moving_ = true;
+      moving = true;
       if (SnapToEdges(hwnd, reinterpret_cast<LPRECT>(lParam)))
         return TRUE;
       break;
     }
     case WM_SIZE: {
-      if (moving_)
+      if (moving)
         snapped_ = false;
       break;
     }
