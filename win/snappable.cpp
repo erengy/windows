@@ -83,9 +83,19 @@ bool Snappable::SnapToEdges(HWND hwnd, LPRECT rc) {
   if (!::GetWindowRect(hwnd, &rect) || !::GetCursorPos(&cursor))
     return false;
 
-  // Check for aero snapping
+  // Check if window is going to be aero-snapped
   if ((rc->right - rc->left != rect.Width()) ||
       (rc->bottom - rc->top != rect.Height()))
+    return false;
+
+  // Check if window has already been aero-snapped
+  WINDOWPLACEMENT wp = {0};
+  wp.length = sizeof(wp);
+  if (!::GetWindowPlacement(hwnd, &wp))
+    return false;
+  Rect wpRect(wp.rcNormalPosition);
+  if ((rc->right - rc->left != wpRect.Width()) ||
+      (rc->bottom - rc->top != wpRect.Height()))
     return false;
 
   RECT wr = {0};
@@ -93,7 +103,7 @@ bool Snappable::SnapToEdges(HWND hwnd, LPRECT rc) {
   if (::GetSystemMetrics(SM_CMONITORS) > 1) {
     HMONITOR monitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
     if (monitor) {
-      MONITORINFO mi;
+      MONITORINFO mi = {0};
       mi.cbSize = sizeof(mi);
       ::GetMonitorInfo(monitor, &mi);
       wr = mi.rcWork;
