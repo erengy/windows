@@ -34,9 +34,9 @@ namespace win {
 
 std::wstring BrowseForFile(HWND hwnd_owner,
                            const std::wstring& title,
-                           std::wstring filter) {
-  if (filter.empty())
-    filter = L"All files (*.*)\0*.*\0";
+                           LPCWSTR filter) {
+  if (!filter)
+    filter = L"All files (*.*)\0*.*\0\0";
 
   WCHAR file[MAX_PATH] = {'\0'};
 
@@ -44,7 +44,7 @@ std::wstring BrowseForFile(HWND hwnd_owner,
   ofn.lStructSize = sizeof(OPENFILENAME);
   ofn.hwndOwner = hwnd_owner;
   ofn.lpstrFile = file;
-  ofn.lpstrFilter = filter.c_str();
+  ofn.lpstrFilter = filter;
   ofn.lpstrTitle = title.c_str();
   ofn.nMaxFile = sizeof(file);
   ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;

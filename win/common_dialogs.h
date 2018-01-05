@@ -32,7 +32,7 @@ namespace win {
 
 std::wstring BrowseForFile(HWND hwnd_owner,
                            const std::wstring& title,
-                           std::wstring filter);
+                           LPCWSTR filter);
 
 bool BrowseForFolder(HWND hwnd_owner,
                      const std::wstring& title,
