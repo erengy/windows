@@ -175,6 +175,7 @@ public:
   BOOL       SetItem(int index, int subitem, LPCWSTR text);
   BOOL       SetItemIcon(int index, int icon);
   BOOL       SetItemIcon(int index, int subitem, int icon);
+  BOOL       SetItemParam(int index, LPARAM lParam);
   void       SetItemState(int index, UINT state, UINT mask);
   BOOL       SetTileViewInfo(PLVTILEVIEWINFO tvi);
   BOOL       SetTileViewInfo(int line_count, DWORD flags, RECT* rc_label_margin = nullptr, SIZE* size_tile = nullptr);

@@ -360,6 +360,15 @@ BOOL ListView::SetItemIcon(int index, int subitem, int icon) {
   return ListView_SetItem(window_, &lvi);
 }
 
+BOOL ListView::SetItemParam(int index, LPARAM lParam) {
+  LVITEM lvi = {0};
+  lvi.iItem = index;
+  lvi.mask = LVIF_PARAM;
+  lvi.lParam = lParam;
+
+  return ListView_SetItem(window_, &lvi);
+}
+
 void ListView::SetItemState(int index, UINT state, UINT mask) {
   ListView_SetItemState(window_, index, state, mask);
 }
