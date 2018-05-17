@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2018 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,9 @@ SOFTWARE.
 
 namespace win {
 
-ListView::ListView()
-    : sort_column_(-1),
-      sort_order_(1),
-      sort_type_(0) {
-}
+ListView::ListView() {}
 
-ListView::ListView(HWND hwnd)
-    : sort_column_(-1),
-      sort_order_(1),
-      sort_type_(0) {
+ListView::ListView(HWND hwnd) {
   SetWindowHandle(hwnd);
 }
 
@@ -406,23 +399,38 @@ int ListView::SetView(DWORD view) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int ListView::GetSortColumn() {
-  return sort_column_;
+int ListView::GetSortColumn(bool secondary) {
+  const auto& sort = !secondary ? sort_.first : sort_.second;
+  return sort.column;
 }
 
-int ListView::GetSortOrder() {
-  return sort_order_;
+int ListView::GetSortOrder(bool secondary) {
+  const auto& sort = !secondary ? sort_.first : sort_.second;
+  return sort.order;
 }
 
-int ListView::GetSortType() {
-  return sort_type_;
+int ListView::GetSortType(bool secondary) {
+  const auto& sort = !secondary ? sort_.first : sort_.second;
+  return sort.type;
 }
 
-void ListView::Sort(int sort_column, int sort_order, int type,
-                    PFNLVCOMPARE compare) {
-  sort_column_ = sort_column;
-  sort_order_ = (sort_order == 0) ? 1 : sort_order;
-  sort_type_ = type;
+void ListView::SetSortOptions(const SortOptions& options, bool secondary) {
+  auto& sort = !secondary ? sort_.first : sort_.second;
+  sort = options;
+}
+
+void ListView::Sort(int column, int order, int type, PFNLVCOMPARE compare) {
+  if (sort_.first.column != column)
+    std::swap(sort_.first, sort_.second);
+
+  sort_.first.column = column;
+  sort_.first.order = (order == 0) ? 1 : order;
+  sort_.first.type = type;
+
+  ListView_SortItemsEx(window_, compare, this);
+}
+
+void ListView::Sort(PFNLVCOMPARE compare) {
   ListView_SortItemsEx(window_, compare, this);
 }
 

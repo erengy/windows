@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2018 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -122,6 +122,12 @@ private:
 
 class ListView : public Window {
 public:
+  struct SortOptions {
+    int column = -1;
+    int order = 1;
+    int type = 0;
+  };
+
   ListView();
   ListView(HWND hwnd);
   virtual ~ListView() {}
@@ -146,9 +152,9 @@ public:
   INT        GetNextItemIndex(int item, int group, LPARAM flags);
   UINT       GetSelectedCount();
   INT        GetSelectionMark();
-  int        GetSortColumn();
-  int        GetSortOrder();
-  int        GetSortType();
+  int        GetSortColumn(bool secondary = false);
+  int        GetSortOrder(bool secondary = false);
+  int        GetSortType(bool secondary = false);
   BOOL       GetSubItemRect(int item, int subitem, LPRECT rect);
   int        GetTopIndex();
   DWORD      GetView();
@@ -177,17 +183,19 @@ public:
   BOOL       SetItemIcon(int index, int subitem, int icon);
   BOOL       SetItemParam(int index, LPARAM lParam);
   void       SetItemState(int index, UINT state, UINT mask);
+  void       SetSortOptions(const SortOptions& options, bool secondary = false);
   BOOL       SetTileViewInfo(PLVTILEVIEWINFO tvi);
   BOOL       SetTileViewInfo(int line_count, DWORD flags, RECT* rc_label_margin = nullptr, SIZE* size_tile = nullptr);
   int        SetView(DWORD view);
-  void       Sort(int sort_column, int sort_order, int type, PFNLVCOMPARE compare);
+  void       Sort(int column, int order, int type, PFNLVCOMPARE compare);
+  void       Sort(PFNLVCOMPARE compare);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
   virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  int sort_column_, sort_order_, sort_type_;
+  std::pair<SortOptions, SortOptions> sort_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
