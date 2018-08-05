@@ -69,7 +69,9 @@ std::wstring RichEdit::GetTextRange(CHARRANGE* cr) {
   tr.chrg.cpMin = cr->cpMin;
   tr.lpstrText = const_cast<LPWSTR>(text.data());
 
-  SendMessage(EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
+  const auto size = SendMessage(
+      EM_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
+  text.resize(size);
 
   return text;
 }
