@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2019 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,21 +55,22 @@ BOOL App::InitInstance() {
 int App::MessageLoop() {
   MSG msg;
 
-  while (::GetMessage(&msg, nullptr, 0, 0)) {
-    BOOL processed = FALSE;
-    if ((msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) ||
-        (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)) {
+  const auto pretranslate_message = [this](MSG& msg) {
+    if ((WM_KEYFIRST <= msg.message && msg.message <= WM_KEYLAST) ||
+        (WM_MOUSEFIRST <= msg.message && msg.message <= WM_MOUSELAST)) {
       for (HWND hwnd = msg.hwnd; hwnd != nullptr; hwnd = ::GetParent(hwnd)) {
-        auto window = window_map.GetWindow(hwnd);
-        if (window) {
-          processed = window->PreTranslateMessage(&msg);
-          if (processed)
-            break;
+        if (const auto window = window_map_.GetWindow(hwnd)) {
+          if (window->PreTranslateMessage(&msg)) {
+            return true;
+          }
         }
       }
     }
+    return false;
+  };
 
-    if (!processed) {
+  while (::GetMessage(&msg, nullptr, 0, 0)) {
+    if (!pretranslate_message(msg)) {
       ::TranslateMessage(&msg);
       ::DispatchMessage(&msg);
     }
