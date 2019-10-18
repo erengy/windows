@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2019 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,9 @@ public:
   BOOL SetCurrentDirectory(const std::wstring& directory);
 
 private:
-  HINSTANCE instance_;
+  static App& Instance(App* app = nullptr);
+
+  HINSTANCE instance_ = nullptr;
 };
 
 }  // namespace win

@@ -34,6 +34,7 @@ namespace win {
 
 App::App() {
   instance_ = ::GetModuleHandle(nullptr);
+  Instance(this);
 }
 
 App::~App() {
@@ -113,6 +114,11 @@ std::wstring App::GetModulePath() const {
 
 BOOL App::SetCurrentDirectory(const std::wstring& directory) {
   return ::SetCurrentDirectory(directory.c_str());
+}
+
+App& App::Instance(App* app) {
+  static App* app_ = app;
+  return *app_;
 }
 
 }  // namespace win
