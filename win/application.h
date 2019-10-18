@@ -28,12 +28,16 @@ SOFTWARE.
 
 #include <windows.h>
 
+#include "window_map.h"
+
 namespace win {
 
 class App {
 public:
   App();
   virtual ~App();
+
+  friend class WindowMap;
 
   BOOL InitCommonControls(DWORD flags) const;
 
@@ -51,6 +55,7 @@ private:
   static App& Instance(App* app = nullptr);
 
   HINSTANCE instance_ = nullptr;
+  WindowMap window_map_;
 };
 
 }  // namespace win

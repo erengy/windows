@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2019 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -160,7 +160,7 @@ void Window::Destroy() {
     prev_window_proc_ = nullptr;
   }
 
-  window_map.Remove(this);
+  WindowMap::Instance().Remove(this);
   window_ = nullptr;
 }
 
@@ -216,8 +216,8 @@ void Window::Attach(HWND hwnd) {
   Detach();
 
   if (::IsWindow(hwnd)) {
-    if (!window_map.GetWindow(hwnd)) {
-      window_map.Add(hwnd, this);
+    if (!WindowMap::Instance().GetWindow(hwnd)) {
+      WindowMap::Instance().Add(hwnd, this);
       Subclass(hwnd);
     }
   }
@@ -263,7 +263,7 @@ HWND Window::Detach() {
   if (prev_window_proc_)
     UnSubclass();
 
-  window_map.Remove(this);
+  WindowMap::Instance().Remove(this);
 
   window_ = nullptr;
 
@@ -636,13 +636,13 @@ void Window::UnSubclass() {
 
 LRESULT CALLBACK Window::WindowProcStatic(HWND hwnd, UINT uMsg,
                                           WPARAM wParam, LPARAM lParam) {
-  Window* window = window_map.GetWindow(hwnd);
+  Window* window = WindowMap::Instance().GetWindow(hwnd);
 
   if (!window) {
     window = current_window_;
     if (window) {
       window->SetWindowHandle(hwnd);
-      window_map.Add(hwnd, window);
+      WindowMap::Instance().Add(hwnd, window);
     }
   }
 

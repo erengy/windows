@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2019 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -231,13 +231,13 @@ BOOL Dialog::ShowDlgItem(int id_item, int cmd_show) {
 
 INT_PTR CALLBACK Dialog::DialogProcStatic(HWND hwnd, UINT uMsg,
                                           WPARAM wParam, LPARAM lParam) {
-  Dialog* window = reinterpret_cast<Dialog*>(window_map.GetWindow(hwnd));
+  Dialog* window = reinterpret_cast<Dialog*>(WindowMap::Instance().GetWindow(hwnd));
 
   if (!window && uMsg == WM_INITDIALOG) {
     window = reinterpret_cast<Dialog*>(lParam);
     if (window) {
       window->SetWindowHandle(hwnd);
-      window_map.Add(hwnd, window);
+      WindowMap::Instance().Add(hwnd, window);
     }
   }
 

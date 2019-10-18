@@ -28,7 +28,6 @@ SOFTWARE.
 
 #include "application.h"
 #include "window.h"
-#include "window_map.h"
 
 namespace win {
 
@@ -38,7 +37,7 @@ App::App() {
 }
 
 App::~App() {
-  window_map.Clear();
+  window_map_.Clear();
 }
 
 BOOL App::InitCommonControls(DWORD flags) const {

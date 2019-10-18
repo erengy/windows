@@ -41,10 +41,10 @@ public:
   void Remove(HWND hwnd);
   void Remove(Window* window);
 
+  static WindowMap& Instance();
+
 private:
   std::map<HWND, Window*> window_map_;
 };
-
-extern WindowMap window_map;
 
 }  // namespace win
