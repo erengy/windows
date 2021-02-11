@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -102,10 +102,10 @@ public:
   BOOL    SetPlacement(const WINDOWPLACEMENT& wp) const;
   BOOL    SetPosition(HWND hwnd_insert_after, int x, int y, int w, int h, UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) const;
   BOOL    SetPosition(HWND hwnd_insert_after, const RECT& rc, UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) const;
-  BOOL    SetRedraw(BOOL redraw) const;
+  LRESULT SetRedraw(BOOL redraw) const;
   void    SetStyle(UINT style, UINT style_not, int index = GWL_STYLE) const;
-  BOOL    SetText(LPCWSTR text) const;
-  BOOL    SetText(const std::wstring& text) const;
+  LRESULT SetText(LPCWSTR text) const;
+  LRESULT SetText(const std::wstring& text) const;
   HRESULT SetTheme(LPCWSTR theme_name = L"explorer") const;
   BOOL    SetTransparency(BYTE alpha, COLORREF color = 0xFF000000) const;
   BOOL    Show(int cmd_show = SW_SHOWNORMAL) const;

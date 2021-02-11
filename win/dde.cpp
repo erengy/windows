@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -95,15 +95,14 @@ BOOL DynamicDataExchange::ClientTransaction(const std::wstring& item,
   DWORD dwResult = 0;
   HSZ hszItem = wType != XTYP_EXECUTE ? CreateStringHandle(item) : nullptr;
 
+  LPBYTE pData =
+      is_unicode_ ? (LPBYTE)data.data() : (LPBYTE)WstrToStr(data).data();
+  DWORD cbData = static_cast<DWORD>(
+      is_unicode_ ? (data.size() + 1) * sizeof(WCHAR) : data.size() + 1);
+  UINT wFmt = is_unicode_ ? CF_UNICODETEXT : CF_TEXT;
+
   HDDEDATA hData = ::DdeClientTransaction(
-      is_unicode_ ? (LPBYTE)data.data() : (LPBYTE)WstrToStr(data).data(),
-      is_unicode_ ? (data.size() + 1) * sizeof(WCHAR) : data.size() + 1,
-      conversation_,
-      hszItem,
-      is_unicode_ ? CF_UNICODETEXT : CF_TEXT,
-      wType,
-      3000,
-      &dwResult);
+      pData, cbData, conversation_, hszItem, wFmt, wType, 3000, &dwResult);
 
   FreeStringHandle(hszItem);
 
@@ -146,7 +145,8 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
                                                    HCONV hconv,
                                                    HSZ hsz1, HSZ hsz2,
                                                    HDDEDATA hdata,
-                                                   DWORD dwData1, DWORD dwData2) {
+                                                   ULONG_PTR dwData1,
+                                                   ULONG_PTR dwData2) {
   DWORD cb = 0;
   LPVOID lpData = nullptr;
   char sz1[256] = {'\0'};

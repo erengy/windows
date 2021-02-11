@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -160,7 +160,7 @@ std::wstring Registry::QueryValue(const std::wstring& value_name) {
 void Registry::SetValue(const std::wstring& value_name,
                         const std::wstring& value) {
   SetValue(value_name.c_str(), REG_SZ, (LPBYTE)value.c_str(),
-           value.length() * sizeof(WCHAR));
+           static_cast<DWORD>(value.size() * sizeof(WCHAR)));
 }
 
 }  // namespace win

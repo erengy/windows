@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,12 +40,12 @@ public:
   virtual void SetSizeMax(LONG cx, LONG cy);
   virtual void SetSizeMin(LONG cx, LONG cy);
 
-  virtual BOOL AddComboString(int id_combo, LPCWSTR text);
+  virtual LRESULT AddComboString(int id_combo, LPCWSTR text);
   virtual BOOL CheckDlgButton(int id_button, UINT check);
   virtual BOOL CheckRadioButton(int id_first_button, int id_last_button, int id_check_button);
   virtual BOOL EnableDlgItem(int id_item, BOOL enable);
   virtual INT  GetCheckedRadioButton(int id_first_button, int id_last_button);
-  virtual INT  GetComboSelection(int id_item);
+  virtual LRESULT GetComboSelection(int id_item);
   virtual HWND GetDlgItem(int id_item);
   virtual UINT GetDlgItemInt(int id_item);
   virtual void GetDlgItemText(int id_item, LPWSTR output, int max_length = MAX_PATH);
@@ -54,8 +54,8 @@ public:
   virtual BOOL HideDlgItem(int id_item);
   virtual BOOL IsDlgButtonChecked(int id_button);
   virtual bool IsModal();
-  virtual BOOL SendDlgItemMessage(int id_item, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  virtual BOOL SetComboSelection(int id_item, int index);
+  virtual LRESULT SendDlgItemMessage(int id_item, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  virtual LRESULT SetComboSelection(int id_item, int index);
   virtual BOOL SetDlgItemText(int id_item, LPCWSTR text);
   virtual BOOL ShowDlgItem(int id_item, int cmd_show = SW_SHOWNORMAL);
 

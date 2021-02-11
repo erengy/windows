@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2019 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -141,7 +141,7 @@ void Dialog::RegisterDlgClass(LPCWSTR class_name) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-BOOL Dialog::AddComboString(int id_combo, LPCWSTR text) {
+LRESULT Dialog::AddComboString(int id_combo, LPCWSTR text) {
   return SendDlgItemMessage(id_combo, CB_ADDSTRING, 0,
                             reinterpret_cast<LPARAM>(text));
 }
@@ -168,7 +168,7 @@ INT Dialog::GetCheckedRadioButton(int id_first_button, int id_last_button) {
   return 0;
 }
 
-INT Dialog::GetComboSelection(int id_item) {
+LRESULT Dialog::GetComboSelection(int id_item) {
   return SendDlgItemMessage(id_item, CB_GETCURSEL, 0, 0);
 }
 
@@ -210,12 +210,12 @@ bool Dialog::IsModal() {
   return modal_;
 }
 
-BOOL Dialog::SendDlgItemMessage(int id_item, UINT uMsg,
-                                WPARAM wParam, LPARAM lParam) {
+LRESULT Dialog::SendDlgItemMessage(int id_item, UINT uMsg,
+                                   WPARAM wParam, LPARAM lParam) {
   return ::SendDlgItemMessage(window_, id_item, uMsg, wParam, lParam);
 }
 
-BOOL Dialog::SetComboSelection(int id_item, int index) {
+LRESULT Dialog::SetComboSelection(int id_item, int index) {
   return SendDlgItemMessage(id_item, CB_SETCURSEL, index, 0);
 }
 
@@ -330,7 +330,8 @@ INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg,
       break;
     }
     case WM_NOTIFY: {
-      LRESULT result = OnNotify(wParam, reinterpret_cast<LPNMHDR>(lParam));
+      LRESULT result = OnNotify(static_cast<int>(wParam),
+                                reinterpret_cast<LPNMHDR>(lParam));
       if (result) {
         ::SetWindowLongPtr(hwnd, DWLP_MSGRESULT, result);
         return TRUE;

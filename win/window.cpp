@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2019 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -556,8 +556,8 @@ BOOL Window::SetPosition(HWND hwnd_insert_after, const RECT& rc,
                         flags);
 }
 
-BOOL Window::SetRedraw(BOOL redraw) const {
-  return ::SendMessage(window_, WM_SETREDRAW, redraw, 0);
+LRESULT Window::SetRedraw(BOOL redraw) const {
+  return SendMessage(WM_SETREDRAW, redraw, 0);
 }
 
 void Window::SetStyle(UINT style, UINT style_not, int index) const {
@@ -565,11 +565,11 @@ void Window::SetStyle(UINT style, UINT style_not, int index) const {
   ::SetWindowLongPtr(window_, index, (old_style | style) & ~style_not);
 }
 
-BOOL Window::SetText(LPCWSTR text) const {
+LRESULT Window::SetText(LPCWSTR text) const {
   return SendMessage(WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text));
 }
 
-BOOL Window::SetText(const std::wstring& text) const {
+LRESULT Window::SetText(const std::wstring& text) const {
   return SetText(text.c_str());
 }
 
