@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,8 @@ HMENU MenuList::CreateNewMenu(const std::wstring& name,
 
   menu_handles.push_back(handle);
 
-  for (auto item = menu->items.begin(); item != menu->items.end(); ++item) {
+  for (size_t i = 0; i < menu->items.size(); ++i) {
+    const auto item = &menu->items[i];
     if (!item->visible)
       continue;
     const UINT flags =
@@ -59,7 +60,7 @@ HMENU MenuList::CreateNewMenu(const std::wstring& name,
         (item->radio ? MFT_RADIOCHECK : 0);
     switch (item->type) {
       case kMenuItemDefault: {
-        UINT_PTR id_new_item = reinterpret_cast<UINT_PTR>(&item->action);
+        UINT id_new_item = static_cast<UINT>(i) + 1;
         ::AppendMenu(handle, MF_STRING | flags, id_new_item,
                      item->name.c_str());
         if (item->def)
@@ -102,18 +103,21 @@ std::wstring MenuList::Show(HWND hwnd, int x, int y, const std::wstring& name) {
   }
 
   UINT flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD;
-  UINT_PTR index = ::TrackPopupMenuEx(menu_handles.front(),
-                                      flags, x, y, hwnd, nullptr);
+  BOOL index = ::TrackPopupMenuEx(menu_handles.front(),
+                                  flags, x, y, hwnd, nullptr);
 
-  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it)
+  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it) {
     ::DestroyMenu(*it);
+  }
 
   if (index > 0) {
-    auto str = reinterpret_cast<std::wstring*>(index);
-    return *str;
-  } else {
-    return std::wstring();
+    if (const auto menu = FindMenu(name)) {
+      const auto& item = menu->items.at(static_cast<size_t>(index) - 1);
+      return item.action;
+    }
   }
+
+  return std::wstring();
 }
 
 void MenuList::Create(const std::wstring& name, const std::wstring& type) {
