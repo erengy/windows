@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2010-2016 Eren Okka
+Copyright (c) 2010-2021 Eren Okka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,17 +32,29 @@ SOFTWARE.
 
 namespace win {
 
-enum MenuItemType {
-  kMenuItemDefault = 0,
-  kMenuItemSeparator,
-  kMenuItemSubmenu
+enum class MenuType {
+  Menu,
+  PopupMenu,
 };
 
-class MenuItem {
-public:
-  bool checked, def, enabled, new_column, radio, visible;
-  std::wstring action, name, submenu;
-  int type;
+enum class MenuItemType {
+  Default,
+  Separator,
+  Submenu,
+};
+
+struct MenuItem {
+  UINT id = 0;
+  bool checked = false;
+  bool def = false;
+  bool enabled = true;
+  bool new_column = false;
+  bool radio = false;
+  bool visible = true;
+  std::wstring action;
+  std::wstring name;
+  std::wstring submenu;
+  MenuItemType type = MenuItemType::Default;
 };
 
 class Menu {
@@ -53,19 +65,25 @@ public:
                   bool checked = false,
                   bool def = false,
                   bool enabled = true,
-                  bool newcolumn = false,
+                  bool new_column = false,
                   bool radio = false);
 
   std::vector<MenuItem> items;
   std::wstring name;
-  std::wstring type;
+  MenuType type = MenuType::PopupMenu;
+
+private:
+  std::map<std::wstring, UINT> actions_;
 };
 
 class MenuList {
 public:
-  void Create(const std::wstring& name, const std::wstring& type);
+  void Create(const std::wstring& name, const MenuType type);
   HMENU CreateNewMenu(const std::wstring& name, std::vector<HMENU>& menu_handles);
+
   Menu* FindMenu(const std::wstring& name);
+  MenuItem* FindMenuItem(const UINT id);
+
   std::wstring Show(HWND hwnd, int x, int y, const std::wstring& name);
 
   std::map<std::wstring, Menu> menus;

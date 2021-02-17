@@ -31,17 +31,20 @@ namespace win {
 
 HMENU MenuList::CreateNewMenu(const std::wstring& name,
                               std::vector<HMENU>& menu_handles) {
-  auto menu = FindMenu(name);
+  const auto menu = FindMenu(name);
 
   if (!menu)
     return nullptr;
 
-  HMENU handle = nullptr;
-  if (menu->type == L"menubar") {
-    handle = ::CreateMenu();
-  } else {
-    handle = ::CreatePopupMenu();
-  }
+  const HMENU handle = [&menu]() {
+    switch (menu->type) {
+      case MenuType::Menu:
+        return ::CreateMenu();
+      default:
+      case MenuType::PopupMenu:
+        return ::CreatePopupMenu();
+    }
+  }();
 
   if (!handle)
     return nullptr;
@@ -50,32 +53,36 @@ HMENU MenuList::CreateNewMenu(const std::wstring& name,
 
   for (size_t i = 0; i < menu->items.size(); ++i) {
     const auto item = &menu->items[i];
+
     if (!item->visible)
       continue;
+
     const UINT flags =
         (item->checked ? MF_CHECKED : 0) |
         (item->def ? MF_DEFAULT : 0) |
         (item->enabled ? MF_ENABLED : MF_GRAYED) |
         (item->new_column ? MF_MENUBARBREAK : 0) |
         (item->radio ? MFT_RADIOCHECK : 0);
+
     switch (item->type) {
-      case kMenuItemDefault: {
-        UINT id_new_item = static_cast<UINT>(i) + 1;
-        ::AppendMenu(handle, MF_STRING | flags, id_new_item,
-                     item->name.c_str());
-        if (item->def)
-          ::SetMenuDefaultItem(handle, id_new_item, FALSE);
+      case MenuItemType::Default: {
+        ::AppendMenu(handle, MF_STRING | flags, item->id, item->name.c_str());
+        if (item->def) {
+          ::SetMenuDefaultItem(handle, item->id, FALSE);
+        }
         break;
       }
-      case kMenuItemSeparator: {
+
+      case MenuItemType::Separator: {
         ::AppendMenu(handle, MF_SEPARATOR, 0, nullptr);
         break;
       }
-      case kMenuItemSubmenu: {
-        auto submenu = FindMenu(item->submenu.c_str());
+
+      case MenuItemType::Submenu: {
+        const auto submenu = FindMenu(item->submenu.c_str());
         if (submenu && submenu != menu) {
-          HMENU submenu_handle = CreateNewMenu(submenu->name.c_str(),
-                                               menu_handles);
+          const HMENU submenu_handle =
+              CreateNewMenu(submenu->name.c_str(), menu_handles);
           ::AppendMenu(handle, MF_POPUP | flags,
                        reinterpret_cast<UINT_PTR>(submenu_handle),
                        item->name.c_str());
@@ -90,9 +97,9 @@ HMENU MenuList::CreateNewMenu(const std::wstring& name,
 
 std::wstring MenuList::Show(HWND hwnd, int x, int y, const std::wstring& name) {
   std::vector<HMENU> menu_handles;
-  CreateNewMenu(name, menu_handles);
+  const auto menu_handle = CreateNewMenu(name, menu_handles);
 
-  if (menu_handles.empty())
+  if (!menu_handle)
     return std::wstring();
 
   if (!x && !y) {
@@ -102,59 +109,77 @@ std::wstring MenuList::Show(HWND hwnd, int x, int y, const std::wstring& name) {
     y = point.y;
   }
 
-  UINT flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD;
-  BOOL index = ::TrackPopupMenuEx(menu_handles.front(),
-                                  flags, x, y, hwnd, nullptr);
+  constexpr UINT flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD;
+  const BOOL item_id =
+      ::TrackPopupMenuEx(menu_handle, flags, x, y, hwnd, nullptr);
 
-  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it) {
-    ::DestroyMenu(*it);
+  for (auto handle : menu_handles) {
+    ::DestroyMenu(handle);
   }
 
-  if (index > 0) {
-    if (const auto menu = FindMenu(name)) {
-      const auto& item = menu->items.at(static_cast<size_t>(index) - 1);
-      return item.action;
+  if (item_id > 0) {
+    if (const auto menu_item = FindMenuItem(item_id)) {
+      return menu_item->action;
     }
   }
 
   return std::wstring();
 }
 
-void MenuList::Create(const std::wstring& name, const std::wstring& type) {
+void MenuList::Create(const std::wstring& name, const MenuType type) {
   menus[name].name = name;
   menus[name].type = type;
 }
 
 Menu* MenuList::FindMenu(const std::wstring& name) {
-  auto it = menus.find(name);
-  if (it != menus.end())
-    return &it->second;
+  const auto it = menus.find(name);
+  return it != menus.end() ? &it->second : nullptr;
+}
 
+MenuItem* MenuList::FindMenuItem(const UINT id) {
+  for (auto& [name, menu] : menus) {
+    for (auto& menu_item : menu.items) {
+      if (menu_item.id == id) {
+        return &menu_item;
+      }
+    }
+  }
   return nullptr;
 }
 
 void Menu::CreateItem(const std::wstring& action, const std::wstring& name,
                       const std::wstring& submenu,
                       bool checked, bool def, bool enabled,
-                      bool newcolumn, bool radio) {
+                      bool new_column, bool radio) {
   MenuItem item;
+
+  item.id = [this, &action]() {
+    const auto it = actions_.find(action);
+    if (it != actions_.end()) {
+      return it->second;
+    } else {
+      static UINT item_id = 0;
+      actions_[action] = ++item_id;
+      return item_id;
+    }
+  }();
 
   item.action = action;
   item.checked = checked;
   item.def = def;
   item.enabled = enabled;
   item.name = name;
-  item.new_column = newcolumn;
+  item.new_column = new_column;
   item.radio = radio;
   item.submenu = submenu;
   item.visible = true;
 
   if (!submenu.empty()) {
-    item.type = kMenuItemSubmenu;
+    item.type = MenuItemType::Submenu;
   } else if (name.empty()) {
-    item.type = kMenuItemSeparator;
+    item.type = MenuItemType::Separator;
   } else {
-    item.type = kMenuItemDefault;
+    item.type = MenuItemType::Default;
   }
 
   items.push_back(item);
